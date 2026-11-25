@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gift Hub — Золотой Дикий Запад</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            western: ['Cinzel', 'serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(229, 181, 72, 0.16), transparent 55%),
+        radial-gradient(circle at 12% 24%, rgba(200, 109, 59, 0.12), transparent 45%),
+        linear-gradient(180deg, #150c06 0%, #090604 60%, #050302 100%);
+      color: #fff7e6;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    .western-card {
+      background: linear-gradient(155deg, rgba(37, 23, 14, 0.96) 0%, rgba(16, 10, 6, 0.99) 100%);
+      border: 1px solid rgba(229, 181, 72, 0.28);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 240, 179, 0.09);
+    }
+
+    .western-card-gold {
+      background: linear-gradient(155deg, rgba(58, 37, 16, 0.96) 0%, rgba(20, 12, 7, 0.99) 100%);
+      border: 1px solid rgba(255, 240, 179, 0.48);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 240, 179, 0.22);
+    }
+
+    .gold-btn {
+      background: linear-gradient(180deg, #fff0b3 0%, #e5b548 52%, #9e6712 100%);
+      color: #190e03;
+      border: 1px solid #fff5cc;
+      box-shadow: 0 6px 18px rgba(229, 181, 72, 0.34), inset 0 1px 1px rgba(255, 255, 255, 0.75);
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+
+    .gold-btn:active:not(:disabled) {
+      transform: scale(0.97);
+      filter: brightness(0.95);
+    }
+
+    .gold-btn:disabled {
+      background: linear-gradient(180deg, #33261c 0%, #1d1510 100%);
+      color: #7d6b5b;
+      border-color: #423326;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .brass-btn {
+      background: linear-gradient(180deg, #312013 0%, #19100a 100%);
+      border: 1px solid rgba(229, 181, 72, 0.35);
+      color: #ffe8b8;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 240, 179, 0.08);
+      transition: transform 0.12s ease, border-color 0.15s ease;
+    }
+
+    .brass-btn:active:not(:disabled) {
+      transform: scale(0.96);
+      border-color: rgba(255, 240, 179, 0.7);
+    }
+
+    .wheel-glow {
+      box-shadow:
+        0 0 0 6px #23140a,
+        0 0 0 9px #b87b18,
+        0 0 0 11px #3b230d,
+        0 0 40px rgba(229, 181, 72, 0.26);
+    }
+
+    .upgrade-ring-glow {
+      box-shadow:
+        0 0 0 5px #1d1108,
+        0 0 0 8px rgba(229, 181, 72, 0.65),
+        0 0 36px rgba(229, 181, 72, 0.24);
+    }
+
+    .upgrade-stars-bg {
+      background-image:
+        radial-gradient(2px 2px at 15% 18%, rgba(255, 240, 179, 0.85), transparent),
+        radial-gradient(2.5px 2.5px at 84% 22%, rgba(229, 181, 72, 0.8), transparent),
+        radial-gradient(1.5px 1.5px at 22% 76%, rgba(255, 240, 179, 0.75), transparent),
+        radial-gradient(2px 2px at 78% 74%, rgba(229, 181, 72, 0.85), transparent),
+        radial-gradient(1.5px 1.5px at 50% 10%, rgba(255, 255, 255, 0.65), transparent),
+        radial-gradient(2px 2px at 90% 50%, rgba(229, 181, 72, 0.65), transparent);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-slide-up {
+      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="w-full max-w-[440px] min-h-screen bg-[#0e0906] border-x border-[#2d1d11] flex flex-col relative shadow-2xl pb-28">
+
+    <!-- ШАПКА ПРОФИЛЯ И БАЛАНСА -->
+    <header class="sticky top-0 z-30 bg-[#110b07]/95 backdrop-blur-md border-b border-[#332113] px-3.5 py-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="header-avatar-box" class="w-9 h-9 rounded-full bg-gradient-to-br from-[#fff0b3] via-[#e5b548] to-[#7c5015] p-[1.5px] shrink-0 overflow-hidden">
+            <div class="w-full h-full rounded-full bg-[#1c120b] flex items-center justify-center text-base font-black text-amber-200">🤠</div>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span id="header-name" class="text-xs font-extrabold text-amber-100 truncate">Старатель</span>
+              <span id="tg-badge" class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold uppercase">TG</span>
+            </div>
+            <div class="text-[11px] text-amber-200/70">Золотой Дикий Запад</div>
+          </div>
+        </div>
+
+        <button onclick="openDepositModal()" class="flex items-center gap-1.5 bg-[#1b120b] border border-amber-400/45 rounded-full pl-3 pr-1 py-1 shrink-0 cursor-pointer">
+          <span class="text-sm">⭐</span>
+          <span id="header-balance" class="text-sm font-black text-amber-300">0</span>
+          <span class="w-7 h-7 rounded-full gold-btn flex items-center justify-center font-black text-base leading-none ml-0.5">+</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- УВЕДОМЛЕНИЯ (ТОСТЫ) -->
+    <div id="toast-container" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[400px] pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ ВКЛАДОК -->
+    <main class="flex-1 px-3.5 pt-3 relative z-10">
+
+      <!-- 1. ВКЛАДКА ПвП -->
+      <section id="tab-pvp" class="space-y-3">
+        <!-- Раунд #1, банк и кнопка поддержки @cashoverseer -->
+        <div class="relative overflow-hidden rounded-2xl border border-amber-400/40 bg-gradient-to-r from-[#29170a] via-[#472910] to-[#211308] px-3.5 py-2.5 shadow-lg">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-base shrink-0">🤠</div>
+              <div class="min-w-0">
+                <div class="font-western text-xs tracking-wider text-amber-300 uppercase font-black">Раунд #<span id="round-number">1</span> • Салун</div>
+                <div class="text-[11px] text-amber-100/75 truncate">От 1 ⭐ • Комиссия 6% с чужих ставок</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="text-right">
+                <div class="text-[9px] uppercase tracking-wider text-amber-200/65 font-bold">Банк</div>
+                <div id="pvp-total-pot" class="text-sm font-black text-amber-300 leading-tight">0 ⭐</div>
+              </div>
+              <button onclick="openSupportLink()" title="Поддержка @cashoverseer"
+                class="w-9 h-9 rounded-full bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/55 flex items-center justify-center text-xs font-black text-amber-200 cursor-pointer shrink-0">
+                👤+
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Колесо-барабан с таймером 00:15 -->
+        <div class="western-card rounded-3xl p-3.5 flex flex-col items-center">
+          <div class="relative w-[244px] h-[244px] rounded-full wheel-glow flex items-center justify-center bg-[#150d07] mt-1">
+            <!-- Указатель сверху -->
+            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)]">
+              <svg width="32" height="28" viewBox="0 0 36 30" fill="none">
+                <path d="M18 28L2 3H34L18 28Z" fill="url(#pvpPointerGrad)" stroke="#FFF5CC" stroke-width="2" stroke-linejoin="round"/>
+                <defs>
+                  <linearGradient id="pvpPointerGrad" x1="18" y1="2" x2="18" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFF0B3"/>
+                    <stop offset="1" stop-color="#B87A14"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <canvas id="pvp-wheel-canvas" class="w-full h-full rounded-full"></canvas>
+
+            <!-- Центр барабана с таймером -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-[108px] h-[108px] rounded-full bg-gradient-to-b from-[#28190e] to-[#0d0805] border-2 border-amber-400/80 shadow-[inset_0_2px_10px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center text-center px-1">
+                <span id="wheel-status-label" class="text-[9px] uppercase tracking-wider text-amber-300/80 font-bold mb-0.5">ЖДЁМ 2+</span>
+                <span id="wheel-timer" class="text-xl font-black text-amber-50 tracking-wider font-mono">00:15</span>
+                <span id="wheel-user-chance" class="text-[10px] font-extrabold text-amber-300 mt-0.5">Шанс: 0%</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="pvp-status-banner" class="w-full mt-3 px-3 py-2 rounded-2xl bg-black/40 border border-amber-500/20 text-[11.5px] text-amber-100/85 text-center leading-snug">
+            В банке <strong>GOLDENBANK</strong>. Сделайте ставку от <strong>1 ⭐</strong> — отсчёт 15 сек стартует от 2 участников.
+          </div>
+
+          <!-- Поле ставки и быстрые кнопки -->
+          <div class="w-full flex gap-2 mt-3">
+            <input id="pvp-bet-input" type="number" min="1" step="1" placeholder="Ставка от 1 ⭐"
+              class="flex-1 min-w-0 bg-[#110a06] border border-amber-500/40 rounded-2xl px-3.5 py-2.5 text-sm font-black text-amber-100 focus:outline-none focus:border-amber-400" />
+            <button id="pvp-bet-btn" onclick="placePvpBet()" class="gold-btn rounded-2xl px-4 py-2.5 text-xs sm:text-sm font-black cursor-pointer shrink-0">
+              Поставить ⭐
+            </button>
+          </div>
+
+          <div class="w-full grid grid-cols-5 gap-1.5 mt-2">
+            <button onclick="setPvpQuickBet(1)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+1 ⭐</button>
+            <button onclick="setPvpQuickBet(5)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+5 ⭐</button>
+            <button onclick="setPvpQuickBet(25)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+25 ⭐</button>
+            <button onclick="setPvpQuickBet(100)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+100 ⭐</button>
+            <button onclick="setPvpAllIn()" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold text-amber-300 cursor-pointer">ВСЁ</button>
+          </div>
+        </div>
+
+        <!-- Участники раунда -->
+        <div class="western-card rounded-2xl p-3">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-amber-200/85">🔫 Участники раунда</h2>
+            <span id="players-count-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">1 участник</span>
+          </div>
+          <div id="pvp-players-list" class="space-y-2"></div>
+        </div>
+
+        <!-- История дуэлей с 3 вкладками -->
+        <div class="western-card rounded-2xl p-3">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-amber-200/85">📜 История дуэлей</h2>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">Комиссия 6%</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-1.5 bg-black/45 p-1 rounded-2xl border border-amber-500/20 mb-2.5">
+            <button id="hist-tab-recent" onclick="switchHistoryTab('recent')"
+              class="py-1.5 px-2 rounded-xl text-[11px] font-extrabold cursor-pointer bg-amber-500/25 text-amber-200 border border-amber-400/40">
+              Последние 15
+            </button>
+            <button id="hist-tab-bank" onclick="switchHistoryTab('bank')"
+              class="py-1.5 px-2 rounded-xl text-[11px] font-bold cursor-pointer text-amber-200/60">
+              Топ банк (5)
+            </button>
+            <button id="hist-tab-lucky" onclick="switchHistoryTab('lucky')"
+              class="py-1.5 px-2 rounded-xl text-[11px] font-bold cursor-pointer text-amber-200/60">
+              Везучие (5)
+            </button>
+          </div>
+
+          <div id="pvp-history-list" class="space-y-2 text-xs"></div>
+        </div>
+      </section>
+
+      <!-- 2. ВКЛАДКА СОЛО (АПГРЕЙД И МЯЧИ) -->
+      <section id="tab-solo" class="hidden space-y-3">
+        <!-- Две карточки выбора -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <button id="solo-pick-upgrade" onclick="switchSoloMode('upgrade')"
+            class="western-card-gold upgrade-stars-bg rounded-2xl p-3 flex items-center gap-2.5 text-left border-2 border-amber-400 cursor-pointer relative overflow-hidden">
+            <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-2xl shrink-0 z-10">
+              🎯
+            </div>
+            <div class="min-w-0 z-10">
+              <div class="text-sm font-black text-amber-200 truncate">Апгрейд</div>
+              <div class="text-[11px] text-amber-300 font-bold">Побед: <span id="solo-upgrade-wins">0</span></div>
+            </div>
+          </button>
+
+          <button id="solo-pick-balls" onclick="switchSoloMode('balls')"
+            class="western-card upgrade-stars-bg rounded-2xl p-3 flex items-center gap-2.5 text-left border border-amber-500/25 cursor-pointer relative overflow-hidden">
+            <div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/35 flex items-center justify-center text-2xl shrink-0 z-10">
+              ⚽
+            </div>
+            <div class="min-w-0 z-10">
+              <div class="text-sm font-black text-amber-100 truncate">Мячи</div>
+              <div class="text-[11px] text-amber-200/75 font-bold">Побед: <span id="solo-balls-wins">0</span></div>
+            </div>
+          </button>
+        </div>
+
+        <!-- РЕЖИМ СОЛО: АПГРЕЙД -->
+        <div id="solo-mode-upgrade" class="space-y-3">
+          <div class="western-card upgrade-stars-bg rounded-3xl p-4 flex flex-col items-center relative overflow-hidden">
+            <div class="w-full flex items-center justify-between text-[11px] mb-2 z-10">
+              <span class="px-2.5 py-0.5 rounded-full bg-black/50 border border-amber-400/35 text-amber-200 font-bold">
+                ⭐ Звёздное колесо
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-300 font-extrabold">
+                Вычет ~2.5%
+              </span>
+            </div>
+
+            <div class="relative w-[216px] h-[216px] rounded-full upgrade-ring-glow bg-[#150d07] flex items-center justify-center z-10">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 drop-shadow-[0_3px_8px_rgba(0,0,0,0.9)]">
+                <svg width="28" height="24" viewBox="0 0 36 30" fill="none">
+                  <path d="M18 28L2 3H34L18 28Z" fill="url(#upgPtr)" stroke="#FFF5CC" stroke-width="2" stroke-linejoin="round"/>
+                  <defs>
+                    <linearGradient id="upgPtr" x1="18" y1="2" x2="18" y2="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#FFF0B3"/>
+                      <stop offset="1" stop-color="#B87A14"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <canvas id="solo-upgrade-canvas" class="w-full h-full rounded-full"></canvas>
+
+              <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="w-[100px] h-[100px] rounded-full bg-gradient-to-b from-[#28190e] to-[#0d0805] border-2 border-amber-400/80 flex flex-col items-center justify-center text-center px-1">
+                  <span class="text-[9px] uppercase tracking-wider text-amber-200/70 font-bold">Шанс</span>
+                  <span id="solo-final-chance" class="text-lg font-black text-amber-300 leading-tight">47.5%</span>
+                  <span id="solo-penalty-label" class="text-[9px] font-bold text-rose-300">-2.5% салун</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-full grid grid-cols-3 gap-1.5 mt-4 text-center z-10">
+              <div class="bg-black/45 border border-amber-500/20 rounded-xl p-2">
+                <div class="text-[10px] text-amber-200/60">Ставка</div>
+                <div id="solo-calc-bet" class="text-xs font-black text-amber-100 mt-0.5">50 ⭐</div>
+              </div>
+              <div class="bg-black/45 border border-amber-500/20 rounded-xl p-2">
+                <div class="text-[10px] text-amber-200/60">Цель</div>
+                <div id="solo-calc-target" class="text-xs font-black text-amber-300 mt-0.5">113 ⭐</div>
+              </div>
+              <div class="bg-black/45 border border-amber-500/20 rounded-xl p-2">
+                <div class="text-[10px] text-amber-200/60">Салун</div>
+                <div id="solo-calc-penalty" class="text-xs font-black text-rose-300 mt-0.5">-2.5%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="western-card rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label for="solo-bet-input" class="text-xs font-extrabold text-amber-200">Ставка (от 1 ⭐)</label>
+              <span class="text-[11px] text-amber-200/70">Баланс: <strong id="solo-balance-inline" class="text-amber-300">0 ⭐</strong></span>
+            </div>
+
+            <div class="relative">
+              <input id="solo-bet-input" type="number" min="1" step="1" value="50" oninput="updateUpgradeUI()"
+                class="w-full bg-[#110a06] border border-amber-500/40 rounded-2xl px-4 py-2.5 text-base font-black text-amber-100 focus:outline-none focus:border-amber-400" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-amber-300 text-sm font-black">⭐</span>
+            </div>
+
+            <div class="grid grid-cols-5 gap-1.5">
+              <button onclick="setSoloBet(1)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">1 ⭐</button>
+              <button onclick="setSoloBet(10)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">10 ⭐</button>
+              <button onclick="setSoloBet(25)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">25 ⭐</button>
+              <button onclick="setSoloBet(50)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">50 ⭐</button>
+              <button onclick="setSoloBet(100)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">100 ⭐</button>
+            </div>
+
+            <div>
+              <div class="text-xs font-extrabold text-amber-200 mb-1.5">Цель апгрейда</div>
+              <div id="solo-targets-grid" class="grid grid-cols-2 gap-2"></div>
+            </div>
+
+            <button id="btn-run-upgrade" onclick="runSoloUpgrade()"
+              class="w-full gold-btn py-3.5 px-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 cursor-pointer">
+              <span>🤠</span>
+              <span id="btn-run-upgrade-text">Крутить Апгрейд</span>
+            </button>
+          </div>
+
+          <div class="western-card rounded-2xl p-3.5">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-200/85">🔥 Живая лента побед • Апгрейд</h3>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-bold">LIVE</span>
+            </div>
+            <div id="upgrade-live-feed" class="space-y-1.5 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- РЕЖИМ СОЛО: МЯЧИ (УРОВЕНЬ 1, КОЛОДА 42 МЯЧА) -->
+        <div id="solo-mode-balls" class="hidden space-y-3">
+          <div class="western-card rounded-3xl p-3">
+            <div class="flex items-center justify-between text-[11px] mb-2 px-1">
+              <span class="font-extrabold text-amber-200">⚽ Мячи • Уровень 1</span>
+              <span id="balls-deck-badge" class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 font-bold">
+                Колода: 42/42
+              </span>
+            </div>
+
+            <div class="grid grid-cols-4 gap-1.5 mb-2 text-center text-[10.5px]">
+              <div class="bg-black/40 border border-stone-600/40 rounded-xl py-1.5">
+                <div class="text-[9px] text-stone-400 font-bold">0x (20)</div>
+                <div id="balls-used-0x" class="font-black text-stone-200">0</div>
+              </div>
+              <div class="bg-black/40 border border-amber-500/30 rounded-xl py-1.5">
+                <div class="text-[9px] text-amber-300 font-bold">1x (15)</div>
+                <div id="balls-used-1x" class="font-black text-amber-200">0</div>
+              </div>
+              <div class="bg-black/40 border border-orange-400/35 rounded-xl py-1.5">
+                <div class="text-[9px] text-orange-300 font-bold">2x (7)</div>
+                <div id="balls-used-2x" class="font-black text-orange-200">0</div>
+              </div>
+              <div class="bg-black/40 border border-emerald-400/35 rounded-xl py-1.5">
+                <div class="text-[9px] text-emerald-300 font-bold">3x слот</div>
+                <div id="balls-used-3x" class="font-black text-emerald-300">0</div>
+              </div>
+            </div>
+
+            <div class="relative w-full rounded-2xl overflow-hidden border border-amber-500/35 bg-[#120b07]">
+              <canvas id="solo-balls-canvas" class="w-full h-[300px] block"></canvas>
+            </div>
+
+            <div id="balls-status-banner" class="w-full mt-2.5 px-3 py-2 rounded-2xl bg-black/40 border border-amber-500/20 text-[11.5px] text-amber-100/85 text-center">
+              Мяч стартует в случайной точке сверху и катится через колышки 1-го уровня к множителям 0x / 1x / 2x / 3x.
+            </div>
+          </div>
+
+          <div class="western-card rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label for="balls-bet-input" class="text-xs font-extrabold text-amber-200">Ставка за мяч (от 1 ⭐)</label>
+              <span class="text-[11px] text-amber-200/70">Баланс: <strong id="balls-balance-inline" class="text-amber-300">0 ⭐</strong></span>
+            </div>
+
+            <div class="relative">
+              <input id="balls-bet-input" type="number" min="1" step="1" value="10" oninput="updateBallsUI()"
+                class="w-full bg-[#110a06] border border-amber-500/40 rounded-2xl px-4 py-2.5 text-base font-black text-amber-100 focus:outline-none focus:border-amber-400" />
+              <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-amber-300 text-sm font-black">⭐</span>
+            </div>
+
+            <div class="grid grid-cols-5 gap-1.5">
+              <button onclick="setBallsBet(1)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">1 ⭐</button>
+              <button onclick="setBallsBet(5)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">5 ⭐</button>
+              <button onclick="setBallsBet(10)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">10 ⭐</button>
+              <button onclick="setBallsBet(25)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">25 ⭐</button>
+              <button onclick="setBallsBet(50)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">50 ⭐</button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="dropSoloBalls(1)" class="gold-btn py-3 px-3 rounded-2xl font-black text-xs cursor-pointer">
+                ⚽ Пустить мяч
+              </button>
+              <button onclick="dropSoloBalls(5)" class="brass-btn py-3 px-3 rounded-2xl font-black text-xs text-amber-300 border-amber-400/50 cursor-pointer">
+                🔥 Пустить 5 мячей
+              </button>
+            </div>
+          </div>
+
+          <div class="western-card rounded-2xl p-3.5">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-200/85">🔥 Живая лента побед • Мячи</h3>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-bold">LIVE</span>
+            </div>
+            <div id="balls-live-feed" class="space-y-1.5 text-xs"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. ВКЛАДКА МАГАЗИН -->
+      <section id="tab-market" class="hidden space-y-3">
+        <div class="western-card-gold rounded-2xl p-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-base font-black text-amber-200">🎁 Магазин подарков</h2>
+            <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">+13%</span>
+          </div>
+          <p class="text-xs text-amber-100/75 mt-1">
+            Вывод подарков за звёзды с наценкой <strong class="text-amber-300">+13%</strong>. Защита от мультитапа и кулдаун <strong class="text-amber-300">30 сек</strong>.
+          </p>
+
+          <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-amber-500/20">
+            <button id="mode-auto-btn" onclick="setWithdrawMode('auto')"
+              class="rounded-xl p-2.5 text-left border cursor-pointer bg-amber-500/20 border-amber-400 text-amber-100">
+              <div class="text-xs font-extrabold">🤖 Авто от бота</div>
+              <div class="text-[10px] text-amber-200/75 mt-0.5">С баланса бота</div>
+            </button>
+
+            <button id="mode-manual-btn" onclick="setWithdrawMode('manual')"
+              class="rounded-xl p-2.5 text-left border cursor-pointer bg-[#160f0a] border-amber-500/20 text-amber-200/70">
+              <div class="text-xs font-extrabold">🤠 Вручную через бота</div>
+              <div class="text-[10px] text-amber-200/65 mt-0.5">Заявка в бот</div>
+            </button>
+          </div>
+        </div>
+
+        <div id="cooldown-banner" class="hidden rounded-2xl bg-amber-950/85 border border-amber-400/55 px-3.5 py-2.5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-base">⏳</span>
+            <div>
+              <div class="text-xs font-extrabold text-amber-200">Кулдаун вывода</div>
+              <div class="text-[11px] text-amber-200/75">Подождите <span id="cooldown-sec" class="font-mono font-bold text-amber-300">30</span> сек.</div>
+            </div>
+          </div>
+          <span id="cooldown-pill" class="text-xs font-mono font-black px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/35">30s</span>
+        </div>
+
+        <div id="market-gifts-grid" class="grid grid-cols-2 gap-2.5"></div>
+      </section>
+
+      <!-- 4. ВКЛАДКА ПРОФИЛЬ -->
+      <section id="tab-profile" class="hidden space-y-3">
+        <div class="western-card-gold rounded-3xl p-4">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-semibold text-amber-200/75">Баланс старателя</div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-2xl">⭐</span>
+                <span id="profile-balance" class="text-3xl font-black text-amber-50">0</span>
+                <span class="text-sm font-bold text-amber-300">Stars</span>
+              </div>
+              <div id="profile-player-name" class="text-xs font-bold text-amber-200/80 mt-1">Старатель</div>
+            </div>
+            <button onclick="openDepositModal()" class="gold-btn rounded-2xl px-4 py-3 font-black text-xs sm:text-sm cursor-pointer shrink-0">
+              Пополнить ⭐
+            </button>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-amber-500/20 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-amber-200/75">Оборот</span>
+              <span class="font-extrabold text-amber-200"><span id="stat-turnover">0</span> ⭐</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-amber-200/75">Чистый профит</span>
+              <span id="stat-net-profit" class="font-extrabold text-amber-200">0 ⭐</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="western-card rounded-3xl p-3.5">
+            <div class="text-lg mb-1">🏆</div>
+            <div class="text-xs text-amber-200/70">Выиграл раз</div>
+            <div id="stat-wins-count" class="text-xl font-black text-emerald-400 mt-0.5">0</div>
+          </div>
+
+          <div class="western-card rounded-3xl p-3.5">
+            <div class="text-lg mb-1">💀</div>
+            <div class="text-xs text-amber-200/70">Проиграл раз</div>
+            <div id="stat-losses-count" class="text-xl font-black text-rose-400 mt-0.5">0</div>
+          </div>
+
+          <div class="western-card rounded-3xl p-3.5">
+            <div class="text-lg mb-1">🤑</div>
+            <div class="text-xs text-amber-200/70">Выиграл звёзд</div>
+            <div class="text-xl font-black text-amber-300 mt-0.5"><span id="stat-stars-won">0</span> ⭐</div>
+          </div>
+
+          <div class="western-card rounded-3xl p-3.5">
+            <div class="text-lg mb-1">🔥</div>
+            <div class="text-xs text-amber-200/70">Проиграл звёзд</div>
+            <div class="text-xl font-black text-orange-300 mt-0.5"><span id="stat-stars-lost">0</span> ⭐</div>
+          </div>
+        </div>
+
+        <button onclick="openTopsModal()" class="w-full gold-btn rounded-2xl py-3.5 px-4 font-black text-sm flex items-center justify-center gap-2 cursor-pointer">
+          <span>🏆</span>
+          <span>Топы</span>
+        </button>
+      </section>
+    </main>
+
+    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+    <nav class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-[416px] bg-[#160f0a]/95 backdrop-blur-xl border border-amber-500/35 rounded-full p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.85)]">
+      <div class="grid grid-cols-4 gap-1">
+        <button id="nav-pvp" onclick="switchTab('pvp')"
+          class="rounded-full py-2 px-2 flex flex-col items-center justify-center transition-all cursor-pointer bg-gradient-to-b from-amber-500/30 to-amber-700/20 border border-amber-400/55 text-amber-300">
+          <span class="text-xs leading-none mb-0.5">⚔️</span>
+          <span class="text-[10.5px] font-extrabold">ПвП</span>
+        </button>
+
+        <button id="nav-solo" onclick="switchTab('solo')"
+          class="rounded-full py-2 px-2 flex flex-col items-center justify-center transition-all cursor-pointer text-amber-200/60 hover:text-amber-200">
+          <span class="text-xs leading-none mb-0.5">⚡</span>
+          <span class="text-[10.5px] font-bold">Соло</span>
+        </button>
+
+        <button id="nav-market" onclick="switchTab('market')"
+          class="rounded-full py-2 px-2 flex flex-col items-center justify-center transition-all cursor-pointer text-amber-200/60 hover:text-amber-200">
+          <span class="text-xs leading-none mb-0.5">🎁</span>
+          <span class="text-[10.5px] font-bold">Магазин</span>
+        </button>
+
+        <button id="nav-profile" onclick="switchTab('profile')"
+          class="rounded-full py-2 px-2 flex flex-col items-center justify-center transition-all cursor-pointer text-amber-200/60 hover:text-amber-200">
+          <span class="text-xs leading-none mb-0.5">🤠</span>
+          <span class="text-[10.5px] font-bold">Профиль</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- МОДАЛКА ПОПОЛНЕНИЯ (СВОБОДНЫЙ ВЫБОР ОТ 1 ⭐) -->
+    <div id="modal-deposit" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center">
+      <div class="w-full max-w-[440px] western-card-gold rounded-t-3xl p-5 modal-slide-up">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-base font-black text-amber-200">⭐ Пополнение звёзд</h3>
+          <button onclick="closeModal('modal-deposit')" class="w-8 h-8 rounded-full bg-white/10 text-amber-200 flex items-center justify-center cursor-pointer">✕</button>
+        </div>
+
+        <p class="text-xs text-amber-100/75 mb-3">
+          Введите или выберите любое число звёзд (от <strong class="text-amber-300">1 ⭐</strong>):
+        </p>
+
+        <div class="relative mb-2.5">
+          <input id="deposit-amount-input" type="number" min="1" step="1" value="10"
+            class="w-full bg-[#110a06] border border-amber-500/45 rounded-2xl px-4 py-3 text-lg font-black text-amber-100 focus:outline-none focus:border-amber-400" />
+          <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-amber-300 text-base font-black">⭐</span>
+        </div>
+
+        <div class="grid grid-cols-5 gap-1.5 mb-2">
+          <button onclick="adjustDeposit(-10)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">-10</button>
+          <button onclick="adjustDeposit(-1)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">-1</button>
+          <button onclick="adjustDeposit(1)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+1</button>
+          <button onclick="adjustDeposit(10)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+10</button>
+          <button onclick="adjustDeposit(50)" class="brass-btn py-1.5 rounded-xl text-xs font-extrabold cursor-pointer">+50</button>
+        </div>
+
+        <div class="grid grid-cols-5 gap-1.5 mb-4">
+          <button onclick="setDepositValue(1)" class="brass-btn py-1.5 rounded-xl text-[11px] font-bold cursor-pointer">1 ⭐</button>
+          <button onclick="setDepositValue(5)" class="brass-btn py-1.5 rounded-xl text-[11px] font-bold cursor-pointer">5 ⭐</button>
+          <button onclick="setDepositValue(15)" class="brass-btn py-1.5 rounded-xl text-[11px] font-bold cursor-pointer">15 ⭐</button>
+          <button onclick="setDepositValue(50)" class="brass-btn py-1.5 rounded-xl text-[11px] font-bold cursor-pointer">50 ⭐</button>
+          <button onclick="setDepositValue(250)" class="brass-btn py-1.5 rounded-xl text-[11px] font-bold cursor-pointer">250 ⭐</button>
+        </div>
+
+        <button onclick="submitDeposit()" class="w-full gold-btn rounded-2xl py-3.5 font-black text-sm cursor-pointer">
+          Пополнить баланс ⭐
+        </button>
+      </div>
+    </div>
+
+    <!-- МОДАЛКА ТОПОВ -->
+    <div id="modal-tops" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center">
+      <div class="w-full max-w-[440px] western-card-gold rounded-t-3xl p-5 max-h-[84vh] flex flex-col modal-slide-up">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-base font-black text-amber-200">🏆 Топы игроков</h3>
+          <button onclick="closeModal('modal-tops')" class="w-8 h-8 rounded-full bg-white/10 text-amber-200 flex items-center justify-center cursor-pointer">✕</button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-1.5 bg-black/45 p-1 rounded-2xl border border-amber-500/20 mb-3">
+          <button id="top-tab-balance" onclick="switchTopTab('balance')"
+            class="py-2 px-2 rounded-xl text-[11px] font-extrabold cursor-pointer bg-amber-500/25 text-amber-200 border border-amber-400/40">
+            По балансу
+          </button>
+          <button id="top-tab-games" onclick="switchTopTab('games')"
+            class="py-2 px-2 rounded-xl text-[11px] font-bold cursor-pointer text-amber-200/60">
+            По играм
+          </button>
+          <button id="top-tab-losses" onclick="switchTopTab('losses')"
+            class="py-2 px-2 rounded-xl text-[11px] font-bold cursor-pointer text-amber-200/60">
+            Поражения
+          </button>
+        </div>
+
+        <div id="tops-list-container" class="space-y-2 overflow-y-auto pr-1 text-xs"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Безопасное хранилище с fallback в памяти
+    const STORAGE_KEY = 'gifthub_wild_west_v4';
+    const memoryStore = {};
+
+    function safeGetItem(key) {
+      try {
+        if (window.localStorage) {
+          const v = window.localStorage.getItem(key);
+          if (v !== null) return v;
+        }
+      } catch (err) {}
+      return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+    }
+
+    function safeSetItem(key, val) {
+      memoryStore[key] = String(val);
+      try {
+        if (window.localStorage) {
+          window.localStorage.setItem(key, String(val));
+        }
+      } catch (err) {}
+    }
+
+    // Безопасная инициализация Telegram WebApp
+    let tgWebApp = null;
+    let tgUser = null;
+    try {
+      tgWebApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      if (tgWebApp) {
+        if (typeof tgWebApp.ready === 'function') tgWebApp.ready();
+        if (typeof tgWebApp.expand === 'function') tgWebApp.expand();
+        if (typeof tgWebApp.setHeaderColor === 'function') tgWebApp.setHeaderColor('#110b07');
+        if (typeof tgWebApp.setBackgroundColor === 'function') tgWebApp.setBackgroundColor('#0e0906');
+        if (tgWebApp.initDataUnsafe && tgWebApp.initDataUnsafe.user) {
+          tgUser = tgWebApp.initDataUnsafe.user;
+        }
+      }
+    } catch (err) {}
+
+    function getDisplayNameOnly() {
+      try {
+        if (tgUser && tgUser.first_name) {
+          return String(tgUser.first_name).trim() || 'Старатель';
+        }
+      } catch (err) {}
+      return 'Старатель';
+    }
+
+    const MARKET_GIFTS = [
+      { id: 'bear',   name: 'Мишка',   emoji: '🧸', base: 15,  price: Math.ceil(15 * 1.13) },
+      { id: 'heart',  name: 'Сердце',  emoji: '❤️', base: 15,  price: Math.ceil(15 * 1.13) },
+      { id: 'rose',   name: 'Роза',    emoji: '🌹', base: 25,  price: Math.ceil(25 * 1.13) },
+      { id: 'gift',   name: 'Подарок', emoji: '🎁', base: 25,  price: Math.ceil(25 * 1.13) },
+      { id: 'rocket', name: 'Ракета',  emoji: '🚀', base: 50,  price: Math.ceil(50 * 1.13) },
+      { id: 'cake',   name: 'Торт',    emoji: '🎂', base: 50,  price: Math.ceil(50 * 1.13) },
+      { id: 'ring',   name: 'Кольцо',  emoji: '💍', base: 100, price: Math.ceil(100 * 1.13) },
+      { id: 'trophy', name: 'Кубок',   emoji: '🏆', base: 100, price: Math.ceil(100 * 1.13) },
+    ];
+
+    function createInitialState() {
+      return {
+        balance: 0,
+        roundNumber: 1,
+        historyTab: 'recent',
+        duelHistory: [],
+        soloMode: 'upgrade',
+        selectedUpgradeId: 'trophy',
+        upgradeWheelAngle: 0,
+        upgradeLiveFeed: [
+          { nick: 'Билл Пыльный', gift: '💍 Кольцо', chance: 47.5, payout: 113 },
+          { nick: 'Мэри Техас', gift: '🌹 Роза', chance: 62.0, payout: 29 }
+        ],
+        ballsUsedCounts: { 0: 0, 1: 0, 2: 0, 3: 0 },
+        ballsLiveFeed: [
+          { nick: 'Шериф Джек', mult: 3, bet: 15, payout: 45 },
+          { nick: 'Кэссиди', mult: 2, bet: 25, payout: 50 }
+        ],
+        withdrawMode: 'auto',
+        withdrawBusy: false,
+        withdrawCooldown: 0,
+        topTab: 'balance',
+        stats: {
+          turnover: 0,
+          winsCount: 0,
+          lossesCount: 0,
+          starsWon: 0,
+          starsLost: 0,
+          upgradeWins: 0,
+          ballsWins: 0
+        }
+      };
+    }
+
+    function loadAppState() {
+      try {
+        const raw = safeGetItem(STORAGE_KEY);
+        if (!raw) return createInitialState();
+        const parsed = JSON.parse(raw);
+        const base = createInitialState();
+        return {
+          ...base,
+          ...parsed,
+          balance: typeof parsed.balance === 'number' ? parsed.balance : 0,
+          roundNumber: typeof parsed.roundNumber === 'number' && parsed.roundNumber >= 1 ? parsed.roundNumber : 1,
+          ballsUsedCounts: { ...base.ballsUsedCounts, ...(parsed.ballsUsedCounts || {}) },
+          stats: { ...base.stats, ...(parsed.stats || {}) }
+        };
+      } catch (err) {
+        return createInitialState();
+      }
+    }
+
+    const state = loadAppState();
+
+    function saveAppState() {
+      try {
+        safeSetItem(STORAGE_KEY, JSON.stringify({
+          balance: state.balance,
+          roundNumber: state.roundNumber,
+          duelHistory: state.duelHistory.slice(0, 80),
+          upgradeLiveFeed: state.upgradeLiveFeed.slice(0, 15),
+          ballsUsedCounts: state.ballsUsedCounts,
+          ballsLiveFeed: state.ballsLiveFeed.slice(0, 15),
+          withdrawMode: state.withdrawMode,
+          stats: state.stats
+        }));
+      } catch (err) {}
+    }
+
+    function formatStars(val) {
+      const n = Number(val) || 0;
+      const rounded = Math.round(n * 100) / 100;
+      return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(2)} ⭐`;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, tone = 'info') {
+      try {
+        const box = document.getElementById('toast-container');
+        if (!box) return;
+        const palette = {
+          success: 'bg-[#192919] border-emerald-500/60 text-emerald-200',
+          error: 'bg-[#2b1414] border-rose-500/60 text-rose-200',
+          warning: 'bg-[#2b2010] border-amber-400/60 text-amber-200',
+          info: 'bg-[#21160e] border-amber-500/45 text-amber-100'
+        };
+        const el = document.createElement('div');
+        el.className = `px-3.5 py-2.5 rounded-2xl border shadow-xl text-xs font-bold backdrop-blur-md transition-opacity duration-300 ${palette[tone] || palette.info}`;
+        el.textContent = message;
+        box.appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 300);
+        }, 2400);
+      } catch (err) {}
+    }
+
+    function triggerHaptic(kind = 'light') {
+      try {
+        const h = tgWebApp && tgWebApp.HapticFeedback;
+        if (!h) return;
+        if (kind === 'success' || kind === 'warning' || kind === 'error') {
+          if (typeof h.notificationOccurred === 'function') h.notificationOccurred(kind);
+        } else if (typeof h.impactOccurred === 'function') {
+          h.impactOccurred(kind);
+        }
+      } catch (err) {}
+    }
+
+    // ==================== PVP ДУЭЛЬ ====================
+    let pvpParticipants = [];
+    let pvpTimerSec = 15;
+    let pvpSpinning = false;
+    let pvpWheelAngle = 0;
+
+    function initPvpRound() {
+      pvpSpinning = false;
+      pvpTimerSec = 15;
+      pvpWheelAngle = 0;
+      const bankBet = Math.floor(Math.random() * 10) + 1;
+      pvpParticipants = [
+        {
+          id: 'goldenbank_sys',
+          name: 'GOLDENBANK',
+          isUser: false,
+          isBank: true,
+          bet: bankBet,
+          color: '#d49b27'
+        }
+      ];
+      const betBtn = document.getElementById('pvp-bet-btn');
+      if (betBtn) betBtn.disabled = false;
+      updatePvpUI();
+      drawPvpWheel();
+    }
+
+    function hasHumanInRound() {
+      return pvpParticipants.some((p) => p.isUser);
+    }
+
+    function setPvpQuickBet(amount) {
+      const inp = document.getElementById('pvp-bet-input');
+      if (inp) inp.value = amount;
+    }
+
+    function setPvpAllIn() {
+      if (state.balance < 1) {
+        showToast('На балансе 0 ⭐ — пополните звёзды', 'warning');
+        openDepositModal();
+        return;
+      }
+      const inp = document.getElementById('pvp-bet-input');
+      if (inp) inp.value = Math.floor(state.balance);
+    }
+
+    function placePvpBet() {
+      if (pvpSpinning) {
+        showToast('Барабан уже крутится!', 'warning');
+        return;
+      }
+      const inp = document.getElementById('pvp-bet-input');
+      const bet = Math.floor(Number(inp ? inp.value : 0));
+      if (!Number.isFinite(bet) || bet < 1) {
+        showToast('Минимальная ставка — 1 ⭐', 'error');
+        return;
+      }
+      if (state.balance < bet) {
+        showToast('Недостаточно звёзд для ставки', 'error');
+        openDepositModal();
+        return;
+      }
+
+      const wasBelowTwo = pvpParticipants.length < 2;
+      state.balance -= bet;
+      state.stats.turnover += bet;
+
+      const existing = pvpParticipants.find((p) => p.isUser);
+      if (existing) {
+        existing.bet += bet;
+      } else {
+        pvpParticipants.push({
+          id: 'human_player',
+          name: getDisplayNameOnly(),
+          isUser: true,
+          isBank: false,
+          bet,
+          color: '#1e785c'
+        });
+      }
+
+      if (wasBelowTwo && pvpParticipants.length >= 2) {
+        pvpTimerSec = 15;
+      }
+
+      if (inp) inp.value = '';
+      saveAppState();
+      triggerHaptic('medium');
+      updateAllUI();
+      drawPvpWheel();
+      showToast(`Ставка ${bet} ⭐ принята в Раунд #${state.roundNumber}`, 'success');
+    }
+
+    // Комиссия 6% считается только с чужих ставок; своя ставка победителя сохраняется
+    function calculatePvpPayout(winner, participants) {
+      const totalPot = participants.reduce((sum, p) => sum + p.bet, 0);
+      const othersPot = Math.max(0, totalPot - winner.bet);
+      const fee = othersPot >= 2 ? Math.floor(othersPot * 0.06 * 100) / 100 : 0;
+      const netFromOthers = Math.max(0, Math.round((othersPot - fee) * 100) / 100);
+      const totalPayout = Math.round((winner.bet + netFromOthers) * 100) / 100;
+      return { totalPot, othersPot, fee, netFromOthers, totalPayout };
+    }
+
+    function startPvpSpin() {
+      if (pvpSpinning || pvpParticipants.length < 2) return;
+      pvpSpinning = true;
+      const betBtn = document.getElementById('pvp-bet-btn');
+      if (betBtn) betBtn.disabled = true;
+      updatePvpUI();
+
+      const totalPot = pvpParticipants.reduce((sum, p) => sum + p.bet, 0);
+      const ticket = Math.random() * totalPot;
+      let cumulative = 0;
+      let winnerIdx = pvpParticipants.length - 1;
+      let startDeg = 0;
+      let endDeg = 360;
+
+      for (let i = 0; i < pvpParticipants.length; i++) {
+        const p = pvpParticipants[i];
+        const sDeg = (cumulative / totalPot) * 360;
+        cumulative += p.bet;
+        const eDeg = (cumulative / totalPot) * 360;
+        if (ticket <= cumulative) {
+          winnerIdx = i;
+          startDeg = sDeg;
+          endDeg = eDeg;
+          break;
+        }
+      }
+
+      const winner = pvpParticipants[winnerIdx];
+      const landedDeg = startDeg + Math.random() * Math.max(1, endDeg - startDeg);
+      const currentMod = ((pvpWheelAngle % 360) + 360) % 360;
+      const desiredMod = (360 - landedDeg) % 360;
+      const delta = (desiredMod - currentMod + 360) % 360;
+      const fromAngle = pvpWheelAngle;
+      const toAngle = fromAngle + 360 * 5 + delta;
+      const duration = 3400;
+      const startTime = performance.now();
+
+      function frame(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const ease = 1 - Math.pow(1 - progress, 3.2);
+        pvpWheelAngle = fromAngle + (toAngle - fromAngle) * ease;
+        drawPvpWheel();
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          finishPvpRound(winner);
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function finishPvpRound(winner) {
+      const calc = calculatePvpPayout(winner, pvpParticipants);
+      const chanceNum = calc.totalPot > 0 ? Number(((winner.bet / calc.totalPot) * 100).toFixed(2)) : 100;
+      const userPart = pvpParticipants.find((p) => p.isUser);
+
+      if (userPart) {
+        if (winner.isUser) {
+          state.balance = Math.round((state.balance + calc.totalPayout) * 100) / 100;
+          state.stats.winsCount += 1;
+          state.stats.starsWon = Math.round((state.stats.starsWon + calc.netFromOthers) * 100) / 100;
+          triggerHaptic('success');
+          showToast(`🏆 Победа в Раунде #${state.roundNumber}! +${formatStars(calc.totalPayout)}`, 'success');
+        } else {
+          state.stats.lossesCount += 1;
+          state.stats.starsLost = Math.round((state.stats.starsLost + userPart.bet) * 100) / 100;
+          triggerHaptic('error');
+          showToast(`Раунд #${state.roundNumber} забрал ${winner.name}`, 'warning');
+        }
+      } else {
+        showToast(`Раунд #${state.roundNumber}: победил ${winner.name}`, 'info');
+      }
+
+      state.duelHistory.unshift({
+        round: state.roundNumber,
+        winnerName: winner.name,
+        totalPot: calc.totalPot,
+        payout: calc.totalPayout,
+        fee: calc.fee,
+        chance: chanceNum
+      });
+      state.roundNumber += 1;
+      saveAppState();
+      updateAllUI();
+
+      setTimeout(() => {
+        initPvpRound();
+      }, 1500);
+    }
+
+    function drawPvpWheel() {
+      try {
+        const canvas = document.getElementById('pvp-wheel-canvas');
+        if (!canvas) return;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const size = rect.width > 0 ? rect.width : 244;
+        canvas.width = Math.floor(size * dpr);
+        canvas.height = Math.floor(size * dpr);
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const cx = size / 2;
+        const cy = size / 2;
+        const radius = Math.min(cx, cy) - 3;
+        ctx.clearRect(0, 0, size, size);
+
+        const totalPot = pvpParticipants.reduce((sum, p) => sum + p.bet, 0) || 1;
+        ctx.translate(cx, cy);
+        ctx.rotate((pvpWheelAngle * Math.PI) / 180);
+
+        let startRad = -Math.PI / 2;
+        pvpParticipants.forEach((p) => {
+          const sliceRad = (p.bet / totalPot) * Math.PI * 2;
+          const endRad = startRad + sliceRad;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, radius, startRad, endRad);
+          ctx.closePath();
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#fff0b3';
+          ctx.stroke();
+
+          if (sliceRad > 0.25) {
+            ctx.save();
+            ctx.rotate(startRad + sliceRad / 2);
+            ctx.fillStyle = '#140b05';
+            ctx.font = '900 12px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(`${p.bet}⭐`, radius - 14, 4);
+            ctx.restore();
+          }
+          startRad = endRad;
+        });
+
+        ctx.restore();
+      } catch (err) {}
+    }
+
+    function switchHistoryTab(tab) {
+      state.historyTab = tab;
+      saveAppState();
+      ['recent', 'bank', 'lucky'].forEach((t) => {
+        const btn = document.getElementById(`hist-tab-${t}`);
+        if (!btn) return;
+        btn.className = t === tab
+          ? 'py-1.5 px-2 rounded-xl text-[11px] font-extrabold cursor-pointer bg-amber-500/25 text-amber-200 border border-amber-400/40'
+          : 'py-1.5 px-2 rounded-xl text-[11px] font-bold cursor-pointer text-amber-200/60';
+      });
+      renderDuelHistory();
+    }
+
+    function renderDuelHistory() {
+      const listEl = document.getElementById('pvp-history-list');
+      if (!listEl) return;
+
+      let rows = [...state.duelHistory];
+      if (state.historyTab === 'recent') {
+        rows = rows.slice(0, 15);
+      } else if (state.historyTab === 'bank') {
+        rows = rows.sort((a, b) => b.totalPot - a.totalPot).slice(0, 5);
+      } else if (state.historyTab === 'lucky') {
+        rows = rows.sort((a, b) => a.chance - b.chance).slice(0, 5);
+      }
+
+      if (!rows.length) {
+        listEl.innerHTML = '<div class="bg-black/30 border border-amber-500/15 rounded-xl px-3 py-2.5 text-amber-200/55 text-center">Завершённых дуэлей пока нет.</div>';
+        return;
+      }
+
+      listEl.innerHTML = rows.map((item) => `
+        <div class="flex items-center justify-between bg-black/35 border border-amber-500/20 rounded-xl px-3 py-2">
+          <div class="min-w-0">
+            <div class="font-extrabold text-amber-100 truncate">#${item.round} • ${escapeHtml(item.winnerName)}</div>
+            <div class="text-[10px] text-amber-200/65">Банк: ${formatStars(item.totalPot)} • Шанс: ${item.chance.toFixed(2)}%</div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="font-black text-amber-300">+${formatStars(item.payout)}</div>
+            <div class="text-[10px] text-amber-200/60">ком. ${formatStars(item.fee)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updatePvpUI() {
+      document.getElementById('round-number').textContent = state.roundNumber;
+      const totalPot = pvpParticipants.reduce((sum, p) => sum + p.bet, 0);
+      document.getElementById('pvp-total-pot').textContent = formatStars(totalPot);
+      document.getElementById('players-count-badge').textContent = `${pvpParticipants.length} участн.`;
+
+      const secStr = `00:${String(Math.max(0, pvpTimerSec)).padStart(2, '0')}`;
+      document.getElementById('wheel-timer').textContent = secStr;
+
+      const userPart = pvpParticipants.find((p) => p.isUser);
+      const userChance = userPart && totalPot > 0 ? ((userPart.bet / totalPot) * 100).toFixed(1) : '0';
+      document.getElementById('wheel-user-chance').textContent = `Шанс: ${userChance}%`;
+
+      const statusLabel = document.getElementById('wheel-status-label');
+      const banner = document.getElementById('pvp-status-banner');
+      if (pvpSpinning) {
+        statusLabel.textContent = 'КРУТИМ!';
+        banner.innerHTML = `Барабан крутится в <strong>Раунде #${state.roundNumber}</strong>...`;
+      } else if (pvpParticipants.length >= 2 && hasHumanInRound()) {
+        statusLabel.textContent = 'ОТБОЙ';
+        banner.innerHTML = `Таймер <strong>${secStr}</strong> запущен! Комиссия 6% только с чужих ставок.`;
+      } else {
+        statusLabel.textContent = 'ЖДЁМ 2+';
+        banner.innerHTML = `В банке <strong>GOLDENBANK</strong> (${pvpParticipants[0]?.bet || 0} ⭐). Поставьте от <strong>1 ⭐</strong> для запуска отсчёта 15 сек.`;
+      }
+
+      const playersList = document.getElementById('pvp-players-list');
+      playersList.innerHTML = pvpParticipants.map((p) => {
+        const pct = totalPot > 0 ? ((p.bet / totalPot) * 100).toFixed(1) : '100.0';
+        return `
+          <div class="flex items-center justify-between bg-black/35 border border-amber-500/20 rounded-2xl px-3 py-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-3 h-3 rounded-full shrink-0" style="background:${p.color}"></span>
+              <span class="text-xs font-extrabold text-amber-100 truncate">${escapeHtml(p.name)}</span>
+              ${p.isBank ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">БАНК</span>' : ''}
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-xs font-black text-amber-300">${formatStars(p.bet)}</div>
+              <div class="text-[10px] text-amber-200/65 font-bold">${pct}%</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      renderDuelHistory();
+    }
+
+    // ==================== СОЛО: АПГРЕЙД + МЯЧИ ====================
+    let soloSpinning = false;
+
+    function switchSoloMode(mode) {
+      state.soloMode = mode;
+      const cardUpg = document.getElementById('solo-pick-upgrade');
+      const cardBalls = document.getElementById('solo-pick-balls');
+      const panelUpg = document.getElementById('solo-mode-upgrade');
+      const panelBalls = document.getElementById('solo-mode-balls');
+
+      if (mode === 'balls') {
+        cardUpg.className = 'western-card upgrade-stars-bg rounded-2xl p-3 flex items-center gap-2.5 text-left border border-amber-500/25 cursor-pointer relative overflow-hidden';
+        cardBalls.className = 'western-card-gold upgrade-stars-bg rounded-2xl p-3 flex items-center gap-2.5 text-left border-2 border-amber-400 cursor-pointer relative overflow-hidden';
+        panelUpg.classList.add('hidden');
+        panelBalls.classList.remove('hidden');
+        updateBallsUI();
+        drawBallsScene();
+      } else {
+        cardBalls.className = 'western-card upgrade-stars-bg rounded-2xl p-3 flex items-center gap-2.5 text-left border border-amber-500/25 cursor-pointer relative overflow-hidden';
+        cardUpg.className = 'western-card-gold upgrade-stars-bg rounded-2xl p-3 flex items-center gap-2.5 text-left border-2 border-amber-400 cursor-pointer relative overflow-hidden';
+        panelBalls.classList.add('hidden');
+        panelUpg.classList.remove('hidden');
+        updateUpgradeUI();
+      }
+      triggerHaptic('light');
+    }
+
+    function getSelectedUpgradeGift() {
+      return MARKET_GIFTS.find((g) => g.id === state.selectedUpgradeId) || MARKET_GIFTS[MARKET_GIFTS.length - 1];
+    }
+
+    function computeUpgradeChance(bet, targetPrice) {
+      const safeBet = Math.max(1, Number(bet) || 1);
+      const safeTarget = Math.max(1, Number(targetPrice) || 1);
+      const rawPct = (safeBet / safeTarget) * 100;
+      const penalty = Number((2.2 + ((safeBet % 9) / 10)).toFixed(1)); // 2.2% - 3.0%
+      const finalChance = Math.max(1.0, Math.min(95.0, Number((rawPct - penalty).toFixed(1))));
+      return { rawPct, penalty, finalChance };
+    }
+
+    function selectUpgradeGift(id) {
+      if (soloSpinning) return;
+      state.selectedUpgradeId = id;
+      updateUpgradeUI();
+    }
+
+    function setSoloBet(amount) {
+      if (soloSpinning) return;
+      document.getElementById('solo-bet-input').value = Math.max(1, Math.floor(amount));
+      updateUpgradeUI();
+    }
+
+    function drawSoloUpgradeCanvas(finalChance) {
+      try {
+        const canvas = document.getElementById('solo-upgrade-canvas');
+        if (!canvas) return;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const size = rect.width > 0 ? rect.width : 216;
+        canvas.width = Math.floor(size * dpr);
+        canvas.height = Math.floor(size * dpr);
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const cx = size / 2;
+        const cy = size / 2;
+        const radius = Math.min(cx, cy) - 3;
+        ctx.clearRect(0, 0, size, size);
+
+        ctx.translate(cx, cy);
+        ctx.rotate((state.upgradeWheelAngle * Math.PI) / 180);
+
+        const winRad = (finalChance / 100) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, -Math.PI / 2, -Math.PI / 2 + winRad);
+        ctx.closePath();
+        ctx.fillStyle = '#e5b548';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, -Math.PI / 2 + winRad, -Math.PI / 2 + Math.PI * 2);
+        ctx.closePath();
+        ctx.fillStyle = '#24150b';
+        ctx.fill();
+
+        ctx.restore();
+      } catch (err) {}
+    }
+
+    function updateUpgradeUI() {
+      const bet = Math.max(1, Math.floor(Number(document.getElementById('solo-bet-input')?.value) || 1));
+      const gift = getSelectedUpgradeGift();
+      const { penalty, finalChance } = computeUpgradeChance(bet, gift.price);
+
+      document.getElementById('solo-balance-inline').textContent = formatStars(state.balance);
+      document.getElementById('solo-upgrade-wins').textContent = state.stats.upgradeWins;
+      document.getElementById('solo-balls-wins').textContent = state.stats.ballsWins;
+      document.getElementById('solo-final-chance').textContent = `${finalChance.toFixed(1)}%`;
+      document.getElementById('solo-penalty-label').textContent = `-${penalty.toFixed(1)}% салун`;
+      document.getElementById('solo-calc-bet').textContent = `${bet} ⭐`;
+      document.getElementById('solo-calc-target').textContent = `${gift.price} ⭐`;
+      document.getElementById('solo-calc-penalty').textContent = `-${penalty.toFixed(1)}%`;
+
+      const runText = document.getElementById('btn-run-upgrade-text');
+      if (runText) {
+        runText.textContent = soloSpinning
+          ? 'Крутим колесо...'
+          : `Апгрейд на ${gift.emoji} ${gift.name} (${finalChance.toFixed(1)}%)`;
+      }
+
+      const gridEl = document.getElementById('solo-targets-grid');
+      if (gridEl) {
+        gridEl.innerHTML = MARKET_GIFTS.map((g) => {
+          const active = g.id === gift.id;
+          const ch = computeUpgradeChance(bet, g.price).finalChance;
+          return `
+            <button onclick="selectUpgradeGift('${g.id}')"
+              class="rounded-2xl p-2 text-left border flex items-center justify-between gap-1.5 cursor-pointer ${
+                active ? 'bg-amber-500/20 border-amber-400' : 'bg-black/35 border-amber-500/20'
+              }">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="text-lg shrink-0">${g.emoji}</span>
+                <div class="min-w-0">
+                  <div class="text-xs font-extrabold text-amber-100 truncate">${g.name}</div>
+                  <div class="text-[10px] text-amber-300 font-bold">${g.price} ⭐</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-black/40 text-amber-200 shrink-0">${ch.toFixed(1)}%</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      renderSoloFeeds();
+      drawSoloUpgradeCanvas(finalChance);
+    }
+
+    function runSoloUpgrade() {
+      if (soloSpinning) return;
+      const inp = document.getElementById('solo-bet-input');
+      const bet = Math.floor(Number(inp ? inp.value : 0));
+      if (!Number.isFinite(bet) || bet < 1) {
+        showToast('Минимальная ставка — 1 ⭐', 'error');
+        return;
+      }
+      if (state.balance < bet) {
+        showToast('Недостаточно звёзд для апгрейда', 'error');
+        openDepositModal();
+        return;
+      }
+
+      const gift = getSelectedUpgradeGift();
+      const { finalChance } = computeUpgradeChance(bet, gift.price);
+
+      state.balance -= bet;
+      state.stats.turnover += bet;
+      soloSpinning = true;
+      document.getElementById('btn-run-upgrade').disabled = true;
+      updateAllUI();
+
+      const won = Math.random() * 100 < finalChance;
+      const winDeg = (finalChance / 100) * 360;
+      const targetDeg = won
+        ? Math.random() * Math.max(1, winDeg - 2)
+        : winDeg + 3 + Math.random() * Math.max(1, 360 - winDeg - 5);
+
+      const currentMod = ((state.upgradeWheelAngle % 360) + 360) % 360;
+      const desiredMod = (360 - targetDeg) % 360;
+      const delta = (desiredMod - currentMod + 360) % 360;
+      const fromAngle = state.upgradeWheelAngle;
+      const toAngle = fromAngle + 360 * 5 + delta;
+      const duration = 2600;
+      const startTime = performance.now();
+
+      function step(now) {
+        const p = Math.min(1, (now - startTime) / duration);
+        const ease = 1 - Math.pow(1 - p, 3);
+        state.upgradeWheelAngle = fromAngle + (toAngle - fromAngle) * ease;
+        drawSoloUpgradeCanvas(finalChance);
+
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          soloSpinning = false;
+          document.getElementById('btn-run-upgrade').disabled = false;
+
+          if (won) {
+            state.balance = Math.round((state.balance + gift.price) * 100) / 100;
+            state.stats.winsCount += 1;
+            state.stats.upgradeWins += 1;
+            const profit = Math.max(0, Math.round((gift.price - bet) * 100) / 100);
+            state.stats.starsWon = Math.round((state.stats.starsWon + profit) * 100) / 100;
+            state.upgradeLiveFeed.unshift({
+              nick: getDisplayNameOnly(),
+              gift: `${gift.emoji} ${gift.name}`,
+              chance: finalChance,
+              payout: gift.price
+            });
+            triggerHaptic('success');
+            showToast(`🏆 Апгрейд удался! +${formatStars(gift.price)}`, 'success');
+          } else {
+            state.stats.lossesCount += 1;
+            state.stats.starsLost = Math.round((state.stats.starsLost + bet) * 100) / 100;
+            triggerHaptic('error');
+            showToast(`Мимо цели (-${bet} ⭐)`, 'warning');
+          }
+
+          saveAppState();
+          updateAllUI();
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    // МЯЧИ (Уровень 1, колода на 42 мяча: 20x 0x, 15x 1x, 7x 2x, плюс слоты 3x)
+    let ballsDeck = [];
+    let activeBalls = [];
+    let pegFlashes = [];
+    let slotImpulses = [0, 0, 0, 0];
+    let ballsLoopId = null;
+    let lastBallsTime = 0;
+
+    const BALL_SLOTS = [
+      { mult: 0, label: '0x', color: '#6b7280' },
+      { mult: 1, label: '1x', color: '#d97706' },
+      { mult: 2, label: '2x', color: '#f59e0b' },
+      { mult: 3, label: '3x', color: '#10b981' }
+    ];
+
+    function buildBallsDeck() {
+      const deck = [
+        ...Array(20).fill(0),
+        ...Array(15).fill(1),
+        ...Array(7).fill(2)
+      ];
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      ballsDeck = deck;
+    }
+
+    function getLevel1Pegs(w, h) {
+      const pegs = [];
+      const rows = 5;
+      const topY = 38;
+      const slotH = 42;
+      const usableH = h - topY - slotH - 18;
+      const stepY = usableH / Math.max(1, rows - 1);
+
+      for (let r = 0; r < rows; r++) {
+        const cols = 4 + (r % 2);
+        const y = topY + r * stepY;
+        const margin = 36;
+        const span = w - margin * 2;
+        for (let c = 0; c < cols; c++) {
+          const x = margin + (cols === 1 ? 0.5 : c / (cols - 1)) * span;
+          pegs.push({ x, y, r: 4.8 });
+        }
+      }
+      return pegs;
+    }
+
+    function setBallsBet(amount) {
+      document.getElementById('balls-bet-input').value = Math.max(1, Math.floor(amount));
+      updateBallsUI();
+    }
+
+    function dropSoloBalls(count = 1) {
+      const inp = document.getElementById('balls-bet-input');
+      const bet = Math.floor(Number(inp ? inp.value : 0));
+      if (!Number.isFinite(bet) || bet < 1) {
+        showToast('Минимальная ставка — 1 ⭐', 'error');
+        return;
+      }
+
+      const allowed = Math.min(count, Math.floor(state.balance / bet));
+      if (allowed < 1) {
+        showToast('Недостаточно звёзд для запуска мяча', 'error');
+        openDepositModal();
+        return;
+      }
+
+      if (!ballsDeck.length) buildBallsDeck();
+
+      const canvas = document.getElementById('solo-balls-canvas');
+      const rect = canvas ? canvas.getBoundingClientRect() : { width: 360 };
+      const width = rect.width || 360;
+
+      for (let i = 0; i < allowed; i++) {
+        state.balance -= bet;
+        state.stats.turnover += bet;
+
+        // 20x 0x, 15x 1x, 7x 2x из колоды 42; при переполнении или редком бонусе доступен 3x слот
+        let mult = ballsDeck.length ? ballsDeck.pop() : 3;
+        if (ballsDeck.length === 0) buildBallsDeck();
+
+        const targetSlotIdx = mult === 0 ? 0 : mult === 1 ? 1 : mult === 2 ? 2 : 3;
+        const slotW = width / 4;
+        const targetX = slotW * (targetSlotIdx + 0.5) + (Math.random() - 0.5) * (slotW * 0.25);
+
+        activeBalls.push({
+          x: 24 + Math.random() * Math.max(40, width - 48),
+          y: 10 + i * 6,
+          vx: (Math.random() - 0.5) * 2.2,
+          vy: 0.6 + Math.random() * 0.7,
+          r: 7,
+          bet,
+          mult,
+          targetSlotIdx,
+          targetX,
+          trail: []
+        });
+      }
+
+      saveAppState();
+      updateAllUI();
+      triggerHaptic('light');
+      startBallsLoop();
+    }
+
+    function startBallsLoop() {
+      if (ballsLoopId) return;
+      lastBallsTime = performance.now();
+      function loop(now) {
+        const rawDt = (now - (lastBallsTime || now)) / 1000;
+        lastBallsTime = now;
+        const dt = Math.min(rawDt, 0.032) * 60;
+
+        stepBalls(dt);
+        drawBallsScene();
+
+        if (activeBalls.length > 0 || pegFlashes.length > 0 || slotImpulses.some((v) => v > 0.02)) {
+          ballsLoopId = requestAnimationFrame(loop);
+        } else {
+          ballsLoopId = null;
+        }
+      }
+      ballsLoopId = requestAnimationFrame(loop);
+    }
+
+    function stepBalls(dt) {
+      const canvas = document.getElementById('solo-balls-canvas');
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width || 360;
+      const h = rect.height || 300;
+      const slotH = 42;
+      const floorY = h - slotH;
+      const pegs = getLevel1Pegs(w, h);
+
+      for (let i = pegFlashes.length - 1; i >= 0; i--) {
+        pegFlashes[i].radius += 0.45 * dt;
+        pegFlashes[i].alpha -= 0.05 * dt;
+        if (pegFlashes[i].alpha <= 0) pegFlashes.splice(i, 1);
+      }
+
+      for (let s = 0; s < slotImpulses.length; s++) {
+        slotImpulses[s] = Math.max(0, slotImpulses[s] - 0.035 * dt);
+      }
+
+      for (let i = activeBalls.length - 1; i >= 0; i--) {
+        const b = activeBalls[i];
+        b.trail.push({ x: b.x, y: b.y });
+        if (b.trail.length > 7) b.trail.shift();
+
+        b.vy += 0.21 * dt;
+        const steer = (b.targetX - b.x) * 0.0045 * dt;
+        b.vx = (b.vx + steer) * Math.pow(0.992, dt);
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+
+        if (b.x - b.r < 8) {
+          b.x = 8 + b.r;
+          b.vx = Math.abs(b.vx) * 0.7;
+        } else if (b.x + b.r > w - 8) {
+          b.x = w - 8 - b.r;
+          b.vx = -Math.abs(b.vx) * 0.7;
+        }
+
+        for (let pIdx = 0; pIdx < pegs.length; pIdx++) {
+          const p = pegs[pIdx];
+          const dx = b.x - p.x;
+          const dy = b.y - p.y;
+          const dist = Math.hypot(dx, dy);
+          const minDist = b.r + p.r;
+          if (dist > 0 && dist < minDist) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            b.x = p.x + nx * (minDist + 0.5);
+            b.y = p.y + ny * (minDist + 0.5);
+            b.vx = nx * 2.4 + (Math.random() - 0.5) * 1.8;
+            b.vy = Math.abs(ny * 1.9) + 0.5;
+            pegFlashes.push({ x: p.x, y: p.y, radius: p.r + 1, alpha: 0.8 });
+          }
+        }
+
+        if (b.y + b.r >= floorY) {
+          const mult = b.mult;
+          const slotIdx = b.targetSlotIdx;
+          slotImpulses[slotIdx] = 1;
+
+          state.ballsUsedCounts[mult] = (state.ballsUsedCounts[mult] || 0) + 1;
+          const payout = Math.round(b.bet * mult * 100) / 100;
+          const banner = document.getElementById('balls-status-banner');
+
+          if (payout > 0) {
+            state.balance = Math.round((state.balance + payout) * 100) / 100;
+            state.stats.winsCount += 1;
+            state.stats.ballsWins += 1;
+            const profit = Math.max(0, Math.round((payout - b.bet) * 100) / 100);
+            state.stats.starsWon = Math.round((state.stats.starsWon + profit) * 100) / 100;
+            state.ballsLiveFeed.unshift({
+              nick: getDisplayNameOnly(),
+              mult,
+              bet: b.bet,
+              payout
+            });
+            if (banner) banner.innerHTML = `Мяч приземлился в <strong class="text-emerald-300">${mult}x</strong>! Выплата: <strong>+${formatStars(payout)}</strong>.`;
+            triggerHaptic('success');
+          } else {
+            state.stats.lossesCount += 1;
+            state.stats.starsLost = Math.round((state.stats.starsLost + b.bet) * 100) / 100;
+            if (banner) banner.innerHTML = `Мяч упал в <strong class="text-rose-300">0x</strong> (-${b.bet} ⭐).`;
+          }
+
+          activeBalls.splice(i, 1);
+          saveAppState();
+          updateAllUI();
+        }
+      }
+    }
+
+    function drawBallsScene() {
+      try {
+        const canvas = document.getElementById('solo-balls-canvas');
+        if (!canvas) return;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const w = rect.width || 360;
+        const h = rect.height || 300;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.save();
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
+
+        const pegs = getLevel1Pegs(w, h);
+        const slotH = 42;
+        const floorY = h - slotH;
+        const slotW = w / 4;
+
+        BALL_SLOTS.forEach((slot, idx) => {
+          const imp = slotImpulses[idx] || 0;
+          const bounce = Math.sin(imp * Math.PI) * 3;
+          const sx = idx * slotW;
+
+          ctx.fillStyle = imp > 0.05 ? 'rgba(229, 181, 72, 0.35)' : 'rgba(34, 21, 11, 0.92)';
+          ctx.fillRect(sx + 2, floorY + bounce, slotW - 4, slotH - 2);
+
+          ctx.strokeStyle = imp > 0.05 ? '#fff0b3' : 'rgba(229, 181, 72, 0.35)';
+          ctx.lineWidth = imp > 0.05 ? 2 : 1;
+          ctx.strokeRect(sx + 2, floorY + bounce, slotW - 4, slotH - 2);
+
+          ctx.fillStyle = slot.mult === 0 ? '#fca5a5' : '#fff0b3';
+          ctx.font = '900 13px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(slot.label, sx + slotW / 2, floorY + bounce + slotH / 2);
+        });
+
+        for (let f = 0; f < pegFlashes.length; f++) {
+          const fl = pegFlashes[f];
+          ctx.beginPath();
+          ctx.arc(fl.x, fl.y, fl.radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 240, 179, ${fl.alpha.toFixed(2)})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        pegs.forEach((p) => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = '#e5b548';
+          ctx.fill();
+        });
+
+        activeBalls.forEach((b) => {
+          b.trail.forEach((pt, idx) => {
+            const alpha = ((idx + 1) / (b.trail.length + 1)) * 0.32;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, b.r * 0.65, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 240, 179, ${alpha})`;
+            ctx.fill();
+          });
+
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fillStyle = b.mult === 0 ? '#9ca3af' : '#fbbf24';
+          ctx.fill();
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = '#fffbeb';
+          ctx.stroke();
+        });
+
+        ctx.restore();
+      } catch (err) {}
+    }
+
+    function updateBallsUI() {
+      const balEl = document.getElementById('balls-balance-inline');
+      if (balEl) balEl.textContent = formatStars(state.balance);
+      const deckBadge = document.getElementById('balls-deck-badge');
+      if (deckBadge) deckBadge.textContent = `Колода: ${ballsDeck.length}/42`;
+      document.getElementById('balls-used-0x').textContent = state.ballsUsedCounts[0] || 0;
+      document.getElementById('balls-used-1x').textContent = state.ballsUsedCounts[1] || 0;
+      document.getElementById('balls-used-2x').textContent = state.ballsUsedCounts[2] || 0;
+      document.getElementById('balls-used-3x').textContent = state.ballsUsedCounts[3] || 0;
+      renderSoloFeeds();
+    }
+
+    function renderSoloFeeds() {
+      const upFeed = document.getElementById('upgrade-live-feed');
+      if (upFeed) {
+        upFeed.innerHTML = state.upgradeLiveFeed.slice(0, 6).map((item) => `
+          <div class="flex items-center justify-between bg-black/35 border border-amber-500/20 rounded-xl px-3 py-2">
+            <div class="min-w-0">
+              <div class="font-extrabold text-amber-100 truncate">${escapeHtml(item.nick)} • <span class="text-amber-300">${escapeHtml(item.gift)}</span></div>
+              <div class="text-[10px] text-amber-200/60">Шанс ${Number(item.chance).toFixed(1)}%</div>
+            </div>
+            <span class="font-black text-emerald-400 shrink-0">+${formatStars(item.payout)}</span>
+          </div>
+        `).join('');
+      }
+
+      const blFeed = document.getElementById('balls-live-feed');
+      if (blFeed) {
+        blFeed.innerHTML = state.ballsLiveFeed.slice(0, 6).map((item) => `
+          <div class="flex items-center justify-between bg-black/35 border border-amber-500/20 rounded-xl px-3 py-2">
+            <div class="min-w-0">
+              <div class="font-extrabold text-amber-100 truncate">${escapeHtml(item.nick)} • <span class="text-amber-300">${item.mult}x</span></div>
+              <div class="text-[10px] text-amber-200/60">Ставка ${formatStars(item.bet)}</div>
+            </div>
+            <span class="font-black text-emerald-400 shrink-0">+${formatStars(item.payout)}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ==================== МАГАЗИН (+13%, КД 30 СЕК, АВТО/РУЧНОЙ) ====================
+    function setWithdrawMode(mode) {
+      state.withdrawMode = mode;
+      saveAppState();
+      const autoBtn = document.getElementById('mode-auto-btn');
+      const manBtn = document.getElementById('mode-manual-btn');
+      if (mode === 'auto') {
+        autoBtn.className = 'rounded-xl p-2.5 text-left border cursor-pointer bg-amber-500/20 border-amber-400 text-amber-100';
+        manBtn.className = 'rounded-xl p-2.5 text-left border cursor-pointer bg-[#160f0a] border-amber-500/20 text-amber-200/70';
+      } else {
+        manBtn.className = 'rounded-xl p-2.5 text-left border cursor-pointer bg-amber-500/20 border-amber-400 text-amber-100';
+        autoBtn.className = 'rounded-xl p-2.5 text-left border cursor-pointer bg-[#160f0a] border-amber-500/20 text-amber-200/70';
+      }
+    }
+
+    function withdrawGift(giftId) {
+      if (state.withdrawBusy) {
+        showToast('Запрос уже выполняется...', 'warning');
+        return;
+      }
+      if (state.withdrawCooldown > 0) {
+        showToast(`Кулдаун вывода: подождите ${state.withdrawCooldown} сек.`, 'warning');
+        return;
+      }
+
+      const gift = MARKET_GIFTS.find((g) => g.id === giftId);
+      if (!gift) return;
+
+      if (state.balance < gift.price) {
+        showToast(`Нужно ${gift.price} ⭐ для вывода «${gift.name}»`, 'error');
+        openDepositModal();
+        return;
+      }
+
+      state.withdrawBusy = true;
+      renderMarketUI();
+
+      state.balance -= gift.price;
+      state.withdrawCooldown = 30;
+      state.withdrawBusy = false;
+      saveAppState();
+      updateAllUI();
+      triggerHaptic('success');
+
+      try {
+        if (tgWebApp && typeof tgWebApp.sendData === 'function') {
+          tgWebApp.sendData(JSON.stringify({
+            type: 'gift_withdraw',
+            mode: state.withdrawMode,
+            gift: gift.name,
+            base: gift.base,
+            price: gift.price,
+            player: getDisplayNameOnly()
+          }));
+        }
+      } catch (err) {}
+
+      if (state.withdrawMode === 'auto') {
+        showToast(`🤖 Бот отправил «${gift.name}» (${gift.price} ⭐)`, 'success');
+      } else {
+        showToast(`🤠 Заявка на «${gift.name}» (${gift.price} ⭐) ушла в бота`, 'success');
+      }
+    }
+
+    function renderMarketUI() {
+      const grid = document.getElementById('market-gifts-grid');
+      if (!grid) return;
+      const locked = state.withdrawBusy || state.withdrawCooldown > 0;
+
+      grid.innerHTML = MARKET_GIFTS.map((g) => {
+        const canAfford = state.balance >= g.price;
+        let label = `Вывести • ${g.price} ⭐`;
+        if (state.withdrawCooldown > 0) label = `КД ${state.withdrawCooldown}с ⏳`;
+        else if (!canAfford) label = `Нужно ${g.price} ⭐`;
+
+        return `
+          <div class="western-card rounded-2xl p-3 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[10px] text-amber-200/60 mb-1">
+              <span>${g.base} ⭐</span>
+              <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 font-bold">+13%</span>
+            </div>
+            <div class="my-1.5 flex flex-col items-center text-center">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-2xl">${g.emoji}</div>
+              <div class="text-xs font-extrabold text-amber-50 mt-1.5">${g.name}</div>
+            </div>
+            <button onclick="withdrawGift('${g.id}')" ${locked || !canAfford ? 'disabled' : ''}
+              class="w-full gold-btn py-2 px-2 rounded-xl text-[11px] font-black mt-1 cursor-pointer">
+              ${label}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      const cdBanner = document.getElementById('cooldown-banner');
+      if (cdBanner) {
+        if (state.withdrawCooldown > 0) {
+          cdBanner.classList.remove('hidden');
+          document.getElementById('cooldown-sec').textContent = state.withdrawCooldown;
+          document.getElementById('cooldown-pill').textContent = `${state.withdrawCooldown}s`;
+        } else {
+          cdBanner.classList.add('hidden');
+        }
+      }
+    }
+
+    // ==================== ПРОФИЛЬ, ПОПОЛНЕНИЕ И ТОПЫ ====================
+    function openDepositModal() {
+      openModal('modal-deposit');
+    }
+
+    function setDepositValue(val) {
+      document.getElementById('deposit-amount-input').value = Math.max(1, Math.floor(Number(val) || 1));
+    }
+
+    function adjustDeposit(delta) {
+      const inp = document.getElementById('deposit-amount-input');
+      const cur = Math.max(1, Math.floor(Number(inp.value) || 1));
+      inp.value = Math.max(1, cur + delta);
+    }
+
+    function submitDeposit() {
+      const inp = document.getElementById('deposit-amount-input');
+      const amount = Math.floor(Number(inp ? inp.value : 0));
+      if (!Number.isFinite(amount) || amount < 1) {
+        showToast('Введите сумму от 1 ⭐', 'error');
+        return;
+      }
+
+      state.balance += amount;
+      saveAppState();
+      updateAllUI();
+      closeModal('modal-deposit');
+      triggerHaptic('success');
+      showToast(`Баланс пополнен на +${amount} ⭐`, 'success');
+    }
+
+    function openTopsModal() {
+      switchTopTab(state.topTab || 'balance');
+      openModal('modal-tops');
+    }
+
+    function switchTopTab(tab) {
+      state.topTab = tab;
+      ['balance', 'games', 'losses'].forEach((t) => {
+        const btn = document.getElementById(`top-tab-${t}`);
+        if (!btn) return;
+        btn.className = t === tab
+          ? 'py-2 px-2 rounded-xl text-[11px] font-extrabold cursor-pointer bg-amber-500/25 text-amber-200 border border-amber-400/40'
+          : 'py-2 px-2 rounded-xl text-[11px] font-bold cursor-pointer text-amber-200/60';
+      });
+      renderTopsList();
+    }
+
+    function buildTopPlayersPool() {
+      const meNick = getDisplayNameOnly();
+      const myGames = state.stats.winsCount + state.stats.lossesCount;
+      const list = [];
+
+      if (meNick) {
+        list.push({
+          nick: meNick,
+          isMe: true,
+          balance: Number(state.balance) || 0,
+          games: Number(myGames) || 0,
+          losses: Number(state.stats.lossesCount) || 0
+        });
+      }
+
+      return list;
+    }
+
+    function renderTopsList() {
+      const container = document.getElementById('tops-list-container');
+      if (!container) return;
+      const pool = buildTopPlayersPool();
+
+      if (!pool.length) {
+        container.innerHTML = `
+          <div class="bg-black/40 border border-amber-500/25 rounded-2xl p-4 text-center text-xs text-amber-200/75">
+            В рейтинге пока никого нет. Сыграйте раунд или пополните баланс, чтобы попасть в список.
+          </div>
+        `;
+        return;
+      }
+
+      if (state.topTab === 'balance') {
+        const sorted = [...pool].sort((a, b) => b.balance - a.balance);
+        const top50Cutoff = 500;
+        const mePos = sorted.findIndex((p) => p.isMe) + 1;
+        const needToTop50 = Math.max(0, Math.round((top50Cutoff - state.balance + 0.1) * 10) / 10);
+
+        const bannerHtml = `
+          <div class="bg-black/40 border border-amber-400/35 rounded-2xl p-3 mb-2 text-xs">
+            <div>Ваша позиция: <strong class="text-amber-300">#${mePos}</strong> • Ориентир Топ-50: <strong class="text-amber-200">${formatStars(top50Cutoff)}</strong></div>
+            <div class="mt-0.5 text-amber-100/85">
+              ${needToTop50 > 0
+                ? `До ориентира Топ-50 не хватает: <strong class="text-amber-300">${formatStars(needToTop50)}</strong>`
+                : `<strong class="text-emerald-400">Вы достигли ориентира Топ-50 по балансу!</strong>`}
+            </div>
+          </div>
+        `;
+
+        const itemsHtml = sorted.map((p, idx) => `
+          <div class="flex items-center justify-between rounded-xl px-3 py-2 border bg-amber-500/15 border-amber-400">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="font-black text-amber-300">#${idx + 1}</span>
+              <span class="font-bold text-amber-100 truncate">${escapeHtml(p.nick)}</span>
+              ${p.isMe ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-400 text-black font-black">ВЫ</span>' : ''}
+            </div>
+            <span class="font-black text-amber-300 shrink-0">${formatStars(p.balance)}</span>
+          </div>
+        `).join('');
+
+        container.innerHTML = bannerHtml + itemsHtml;
+      } else if (state.topTab === 'games') {
+        const sorted = [...pool].sort((a, b) => b.games - a.games);
+        container.innerHTML = sorted.map((p, idx) => `
+          <div class="flex items-center justify-between rounded-xl px-3 py-2 border bg-amber-500/15 border-amber-400">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="font-black text-amber-300">#${idx + 1}</span>
+              <span class="font-bold text-amber-100 truncate">${escapeHtml(p.nick)}</span>
+              ${p.isMe ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-400 text-black font-black">ВЫ</span>' : ''}
+            </div>
+            <span class="font-black text-amber-300 shrink-0">${p.games} игр</span>
+          </div>
+        `).join('');
+      } else {
+        const sorted = [...pool].sort((a, b) => b.losses - a.losses);
+        container.innerHTML = sorted.map((p, idx) => `
+          <div class="flex items-center justify-between rounded-xl px-3 py-2 border bg-amber-500/15 border-amber-400">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="font-black text-amber-300">#${idx + 1}</span>
+              <span class="font-bold text-amber-100 truncate">${escapeHtml(p.nick)}</span>
+              ${p.isMe ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-400 text-black font-black">ВЫ</span>' : ''}
+            </div>
+            <span class="font-black text-rose-400 shrink-0">${p.losses} поражений</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function updateProfileUI() {
+      const nick = getDisplayNameOnly();
+      document.getElementById('header-name').textContent = nick;
+      document.getElementById('profile-player-name').textContent = nick;
+      document.getElementById('header-balance').textContent = state.balance;
+      document.getElementById('profile-balance').textContent = state.balance;
+      document.getElementById('tg-badge').textContent = tgUser ? 'LIVE' : 'DEMO';
+
+      const avatarBox = document.getElementById('header-avatar-box');
+      if (avatarBox) {
+        if (tgUser && tgUser.photo_url) {
+          avatarBox.innerHTML = `<img src="${escapeHtml(tgUser.photo_url)}" alt="" class="w-full h-full rounded-full object-cover" />`;
+        } else {
+          avatarBox.innerHTML = `<div class="w-full h-full rounded-full bg-[#1c120b] flex items-center justify-center text-sm font-black text-amber-200">${escapeHtml(nick.charAt(0).toUpperCase() || '🤠')}</div>`;
+        }
+      }
+
+      document.getElementById('stat-turnover').textContent = state.stats.turnover;
+      document.getElementById('stat-wins-count').textContent = state.stats.winsCount;
+      document.getElementById('stat-losses-count').textContent = state.stats.lossesCount;
+      document.getElementById('stat-stars-won').textContent = state.stats.starsWon;
+      document.getElementById('stat-stars-lost').textContent = state.stats.starsLost;
+
+      const net = Math.round((state.stats.starsWon - state.stats.starsLost) * 100) / 100;
+      const netEl = document.getElementById('stat-net-profit');
+      netEl.textContent = `${net > 0 ? '+' : ''}${net} ⭐`;
+      netEl.className = `font-extrabold ${net > 0 ? 'text-emerald-400' : net < 0 ? 'text-rose-400' : 'text-amber-200'}`;
+    }
+
+    function updateAllUI() {
+      updateProfileUI();
+      updatePvpUI();
+      updateUpgradeUI();
+      updateBallsUI();
+      renderMarketUI();
+    }
+
+    // ==================== НАВИГАЦИЯ, МОДАЛКИ И ТАЙМЕРЫ ====================
+    function switchTab(tabName) {
+      ['pvp', 'solo', 'market', 'profile'].forEach((t) => {
+        const sec = document.getElementById(`tab-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if (!sec || !nav) return;
+        if (t === tabName) {
+          sec.classList.remove('hidden');
+          nav.className = 'rounded-full py-2 px-2 flex flex-col items-center justify-center transition-all cursor-pointer bg-gradient-to-b from-amber-500/30 to-amber-700/20 border border-amber-400/55 text-amber-300';
+        } else {
+          sec.classList.add('hidden');
+          nav.className = 'rounded-full py-2 px-2 flex flex-col items-center justify-center transition-all cursor-pointer text-amber-200/60 hover:text-amber-200';
+        }
+      });
+
+      if (tabName === 'pvp') setTimeout(drawPvpWheel, 20);
+      else if (tabName === 'solo') {
+        if (state.soloMode === 'balls') setTimeout(drawBallsScene, 20);
+        else setTimeout(updateUpgradeUI, 20);
+      }
+      triggerHaptic('light');
+    }
+
+    function openSupportLink() {
+      triggerHaptic('light');
+      const url = 'https://t.me/cashoverseer';
+      try {
+        if (tgWebApp && typeof tgWebApp.openTelegramLink === 'function') {
+          tgWebApp.openTelegramLink(url);
+          return;
+        }
+      } catch (err) {}
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('hidden');
+    }
+
+    setInterval(() => {
+      try {
+        if (!pvpSpinning && pvpParticipants.length >= 2 && hasHumanInRound()) {
+          if (pvpTimerSec > 0) {
+            pvpTimerSec -= 1;
+            updatePvpUI();
+          } else {
+            startPvpSpin();
+          }
+        }
+        if (state.withdrawCooldown > 0) {
+          state.withdrawCooldown -= 1;
+          renderMarketUI();
+        }
+      } catch (err) {}
+    }, 1000);
+
+    window.addEventListener('resize', () => {
+      drawPvpWheel();
+      updateUpgradeUI();
+      if (state.soloMode === 'balls') drawBallsScene();
+    });
+
+    window.addEventListener('error', () => {
+      showToast('Сработала защита от сбоя', 'warning');
+    });
+
+    function bootGiftHubApp() {
+      if (window.__giftHubBooted) {
+        drawPvpWheel();
+        updateUpgradeUI();
+        if (state.soloMode === 'balls') drawBallsScene();
+        return;
+      }
+      window.__giftHubBooted = true;
+      try {
+        buildBallsDeck();
+        setWithdrawMode(state.withdrawMode);
+        initPvpRound();
+        updateAllUI();
+        drawBallsScene();
+      } catch (err) {
+        showToast('Запуск в безопасном режиме', 'warning');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootGiftHubApp);
+    } else {
+      bootGiftHubApp();
+    }
+
+    window.addEventListener('load', bootGiftHubApp);
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      const appRoot = document.getElementById('app');
+      if (appRoot) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            setTimeout(() => {
+              drawPvpWheel();
+              updateUpgradeUI();
+              if (state.soloMode === 'balls') drawBallsScene();
+            }, 50);
+          }
+        });
+        obs.observe(appRoot);
+      }
+    }
+  </script>
+</body>
+</html>
